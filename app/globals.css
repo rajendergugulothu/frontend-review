@@ -3,6 +3,37 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --ui-font-sans: var(--font-geist-sans), "Avenir Next", "Segoe UI Variable", sans-serif;
+  --ui-text-strong: #101828;
+  --ui-text: #334155;
+  --ui-text-soft: #5b6f88;
+  --ui-border: rgba(122, 140, 172, 0.24);
+  --ui-border-strong: rgba(120, 145, 177, 0.3);
+  --ui-surface: rgba(255, 255, 255, 0.86);
+  --ui-surface-frost: rgba(255, 255, 255, 0.8);
+  --ui-shadow-card: 0 8px 20px rgba(30, 47, 74, 0.08);
+  --ui-shadow-lift: 0 14px 36px rgba(27, 45, 78, 0.1);
+  --ui-shadow-panel: 0 16px 36px rgba(26, 42, 68, 0.1);
+  --ui-radius-card: 1rem;
+  --ui-radius-panel: 1.2rem;
+  --ui-danger-text: #8a2430;
+  --ui-danger-border: rgba(248, 162, 162, 0.78);
+  --ui-danger-bg: rgba(255, 236, 236, 0.88);
+  --ui-info-text: #22577a;
+  --ui-info-border: #c8daea;
+  --ui-info-bg: rgba(219, 239, 255, 0.68);
+  --ui-page-bg-main:
+    radial-gradient(circle at 10% 4%, rgba(14, 165, 233, 0.2), transparent 36%),
+    radial-gradient(circle at 90% 0%, rgba(251, 146, 60, 0.2), transparent 30%),
+    linear-gradient(180deg, #f7fbff 0%, #f1f5fb 45%, #ecf1f8 100%);
+  --ui-page-bg-alt:
+    radial-gradient(circle at 8% 10%, rgba(56, 189, 248, 0.24), transparent 35%),
+    radial-gradient(circle at 92% 0%, rgba(251, 146, 60, 0.22), transparent 31%),
+    linear-gradient(180deg, #f7fbff 0%, #eef4fc 50%, #e8eef7 100%);
+  --ui-page-bg-feedback:
+    radial-gradient(circle at 8% 8%, rgba(14, 165, 233, 0.2), transparent 36%),
+    radial-gradient(circle at 95% 0%, rgba(244, 114, 182, 0.18), transparent 28%),
+    linear-gradient(180deg, #f9fbff 0%, #eff4fc 52%, #e9eff8 100%);
 }
 
 @theme inline {
@@ -12,15 +43,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--ui-font-sans);
 }

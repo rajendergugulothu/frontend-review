@@ -1,0 +1,19 @@
+.wrap {
+  margin-bottom: 0.8rem;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.left {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.wrap :global(img) {
+  width: min(100%, 430px);
+  height: auto;
+  display: block;
+}

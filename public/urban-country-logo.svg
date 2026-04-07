@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 250" role="img" aria-labelledby="title desc">
+  <title id="title">Urban Country Realty and Property Management</title>
+  <desc id="desc">Urban Country Realty brand logo with red roof icon and company text.</desc>
+  <defs>
+    <linearGradient id="roofRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f96363" />
+      <stop offset="100%" stop-color="#b30b14" />
+    </linearGradient>
+    <linearGradient id="steel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1822" />
+      <stop offset="55%" stop-color="#949aa1" />
+      <stop offset="100%" stop-color="#101924" />
+    </linearGradient>
+  </defs>
+
+  <rect width="860" height="250" fill="none" />
+
+  <g transform="translate(10,8)">
+    <path d="M18 150 L140 48 L246 150 L220 174 L140 98 L44 174 Z" fill="url(#roofRed)" stroke="#73050b" stroke-width="4"/>
+    <rect x="104" y="126" width="74" height="72" rx="2" fill="#cf2f2f" stroke="#8f1117" stroke-width="4"/>
+    <line x1="141" y1="126" x2="141" y2="198" stroke="#781117" stroke-width="4"/>
+    <line x1="104" y1="161" x2="178" y2="161" stroke="#781117" stroke-width="4"/>
+
+    <path d="M176 210 L290 24 Q313 6 336 13 Q309 31 290 58 L229 214 Z" fill="url(#steel)"/>
+    <path d="M216 54 Q307 -10 360 17 Q305 44 255 81 Z" fill="#0c1118"/>
+  </g>
+
+  <g transform="translate(392,52)">
+    <text x="0" y="66" fill="#111318" font-size="66" font-family="Arial, Helvetica, sans-serif" font-weight="900" letter-spacing="1.5">URBANCOUNTRY</text>
+    <text x="0" y="112" fill="#c01f25" font-size="39" font-family="Arial, Helvetica, sans-serif" font-weight="700">Realty and Property management</text>
+    <text x="18" y="152" fill="#234b78" font-size="33" font-family="Arial, Helvetica, sans-serif" font-weight="700">Engineered Real Estate Services</text>
+  </g>
+</svg>

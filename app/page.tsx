@@ -1,65 +1,114 @@
-import Image from "next/image";
+import Link from "next/link"
+import BrandLogo from "../components/BrandLogo"
+import styles from "./page.module.css"
+
+const journeyCards = [
+  {
+    title: "Automated Review Routing",
+    description:
+      "Launch review requests after lease signing, move-in, work order completion, or renewal without manual follow-up.",
+  },
+  {
+    title: "Smart Response Handling",
+    description:
+      "Send happy clients to public review platforms and guide low ratings into internal recovery before they spill outward.",
+  },
+  {
+    title: "Urban Country Management Ready",
+    description:
+      "Use one branded review flow for Urban Country Management with QR access, admin visibility, and reminder tracking built in.",
+  },
+]
+
+const triggerEvents = [
+  "Lease signing",
+  "Move-in",
+  "Work order completion",
+  "Lease renewal",
+]
+
+const channels = ["Email", "SMS", "WhatsApp"]
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className={styles.page}>
+      <section className={styles.hero}>
+        <div className={styles.heroCopy}>
+          <BrandLogo align="left" />
+          <p className={styles.eyebrow}>Urban Country Realty Review Hub</p>
+          <h1 className={styles.title}>
+            Turn property management moments into trusted public reviews.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className={styles.subtitle}>
+            Send branded review requests for Urban Country Management, route high ratings to
+            public platforms, capture low ratings privately, and keep the team aware
+            in real time.
           </p>
+
+          <div className={styles.actions}>
+            <Link className={styles.primaryAction} href="/office/urban-country-management">
+              Start Review Flow
+            </Link>
+            <Link className={styles.secondaryAction} href="/admin">
+              Open Admin Dashboard
+            </Link>
+          </div>
+
+          <div className={styles.metaRow}>
+            <span className={styles.metaPill}>Office: Urban Country Management</span>
+            <span className={styles.metaPill}>Channels: Email, SMS, WhatsApp</span>
+            <span className={styles.metaPill}>Low ratings route to internal feedback</span>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className={styles.heroPanel}>
+          <div className={styles.heroPanelHeader}>
+            <p className={styles.panelEyebrow}>Review Journey</p>
+            <h2 className={styles.panelTitle}>What this system handles today</h2>
+          </div>
+
+          <div className={styles.cardGrid}>
+            {journeyCards.map((card) => (
+              <article key={card.title} className={styles.featureCard}>
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+              </article>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
-  );
+      </section>
+
+      <section className={styles.infoGrid}>
+        <article className={styles.infoPanel}>
+          <p className={styles.panelEyebrow}>Automations</p>
+          <h2 className={styles.infoTitle}>Trigger events</h2>
+          <ul className={styles.list}>
+            {triggerEvents.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </article>
+
+        <article className={styles.infoPanel}>
+          <p className={styles.panelEyebrow}>Outreach</p>
+          <h2 className={styles.infoTitle}>Supported channels</h2>
+          <ul className={styles.list}>
+            {channels.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </article>
+
+        <article className={styles.infoPanel}>
+          <p className={styles.panelEyebrow}>Operations</p>
+          <h2 className={styles.infoTitle}>Next actions</h2>
+          <div className={styles.quickLinks}>
+            <Link href="/admin">Review dashboard metrics</Link>
+            <Link href="/office/urban-country-management">Open office intake form</Link>
+            <Link href="/internal-feedback?token=demo">Preview internal feedback page</Link>
+          </div>
+        </article>
+      </section>
+    </main>
+  )
 }
