@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import styles from "./page.module.css"
 import BrandLogo from "../../components/BrandLogo"
@@ -10,24 +10,32 @@ function FeedbackPageContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
 
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
+  const [contactName, setContactName] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
   const [feedback, setFeedback] = useState("")
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    if (!token || typeof window === "undefined") return
+
+    const savedContact = window.sessionStorage.getItem(`review-contact:${token}`)
+    if (!savedContact) return
+
+    try {
+      const parsed = JSON.parse(savedContact) as { name?: string; email?: string }
+      setContactName(parsed.name?.trim() || "")
+      setContactEmail(parsed.email?.trim() || "")
+    } catch {
+      // Ignore malformed saved contact data.
+    }
+  }, [token])
+
   const submitFeedback = async () => {
     if (!token || submitting) return
 
-    const trimmedName = name.trim()
-    const trimmedEmail = email.trim()
     const trimmedFeedback = feedback.trim()
-
-    if (trimmedEmail && !/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
-      setError("Please enter a valid email address or leave it blank.")
-      return
-    }
     if (!trimmedFeedback) {
       setError("Please share what happened.")
       return
@@ -44,8 +52,6 @@ function FeedbackPageContent() {
         },
         body: JSON.stringify({
           token,
-          name: trimmedName || null,
-          email: trimmedEmail || null,
           feedback: trimmedFeedback,
         }),
       })
@@ -54,6 +60,9 @@ function FeedbackPageContent() {
         throw new Error("Failed to submit feedback")
       }
 
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem(`review-contact:${token}`)
+      }
       setSubmitted(true)
     } catch {
       setSubmitting(false)
@@ -110,32 +119,15 @@ function FeedbackPageContent() {
             <h2 className={styles.panelTitle}>Share the details with our team</h2>
           </div>
 
-          <div className={styles.formGrid}>
-            <label className={styles.fieldGroup}>
-              <span className={styles.fieldLabel}>Your Name (Optional)</span>
-              <input
-                type="text"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                className={styles.input}
-                placeholder="Jane Smith"
-                maxLength={120}
-                disabled={submitting || !token}
-              />
-            </label>
-
-            <label className={styles.fieldGroup}>
-              <span className={styles.fieldLabel}>Your Email (Optional)</span>
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className={styles.input}
-                placeholder="jane@example.com"
-                maxLength={180}
-                disabled={submitting || !token}
-              />
-            </label>
+          <div className={styles.contactPanel}>
+            <p className={styles.contactTitle}>We will use the details from your rating</p>
+            <p className={styles.contactCopy}>
+              {contactName || contactEmail
+                ? `Following up for ${contactName || "this customer"}${
+                    contactEmail ? ` at ${contactEmail}` : ""
+                  }.`
+                : "Your name and email from the previous step will be used for follow-up."}
+            </p>
           </div>
 
           <div className={styles.feedbackPanel}>

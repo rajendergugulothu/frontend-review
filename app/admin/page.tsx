@@ -3,7 +3,6 @@
 import Image from "next/image"
 import { useEffect, useMemo, useState } from "react"
 import styles from "./page.module.css"
-import { apiUrl } from "../../lib/api"
 
 type Review = {
   id?: string | number
@@ -72,6 +71,12 @@ export default function AdminPage() {
   const [officeQr, setOfficeQr] = useState<OfficeQrInfo | null>(null)
   const [officeQrError, setOfficeQrError] = useState<string | null>(null)
 
+  const handleUnauthorized = () => {
+    if (typeof window !== "undefined") {
+      window.location.assign("/admin/login")
+    }
+  }
+
   useEffect(() => {
     let isMounted = true
 
@@ -81,9 +86,14 @@ export default function AdminPage() {
 
       try {
         const [reviewsRes, analyticsRes] = await Promise.all([
-          fetch(apiUrl("/admin/reviews")),
-          fetch(apiUrl("/admin/analytics")),
+          fetch("/api/admin/reviews", { cache: "no-store" }),
+          fetch("/api/admin/analytics", { cache: "no-store" }),
         ])
+
+        if (reviewsRes.status === 401 || analyticsRes.status === 401) {
+          handleUnauthorized()
+          return
+        }
 
         if (!reviewsRes.ok || !analyticsRes.ok) {
           throw new Error("Failed to load admin data")
@@ -183,9 +193,13 @@ export default function AdminPage() {
     setRunningReminders(true)
     setReminderMessage(null)
     try {
-      const response = await fetch(apiUrl("/admin/process-reminders"), {
+      const response = await fetch("/api/admin/process-reminders", {
         method: "POST",
       })
+      if (response.status === 401) {
+        handleUnauthorized()
+        return
+      }
       if (!response.ok) {
         throw new Error("Reminder job failed")
       }
@@ -210,9 +224,11 @@ export default function AdminPage() {
     setOfficeQrError(null)
     setOfficeQr(null)
     try {
-      const response = await fetch(
-        apiUrl(`/office/${encodeURIComponent(DEFAULT_OFFICE_SLUG)}/qr`)
-      )
+      const response = await fetch(`/api/admin/office/${encodeURIComponent(DEFAULT_OFFICE_SLUG)}/qr`)
+      if (response.status === 401) {
+        handleUnauthorized()
+        return
+      }
       if (!response.ok) {
         throw new Error("Failed QR request")
       }
@@ -221,6 +237,11 @@ export default function AdminPage() {
     } catch {
       setOfficeQrError("Unable to generate office QR. Check backend service.")
     }
+  }
+
+  const logout = async () => {
+    await fetch("/api/admin/auth/logout", { method: "POST" })
+    handleUnauthorized()
   }
 
   return (
@@ -265,6 +286,13 @@ export default function AdminPage() {
                 onClick={generateOfficeQr}
               >
                 Generate Management QR
+              </button>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={logout}
+              >
+                Log Out
               </button>
             </div>
             {reminderMessage && <p className={styles.actionMessage}>{reminderMessage}</p>}

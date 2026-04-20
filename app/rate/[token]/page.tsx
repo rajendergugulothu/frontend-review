@@ -22,6 +22,7 @@ export default function RatePage() {
   const [email, setEmail] = useState("")
   const [feedback, setFeedback] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [lowRatingRedirectUrl, setLowRatingRedirectUrl] = useState<string | null>(null)
 
   const submitRating = async () => {
     if (!token || loading) return
@@ -83,7 +84,22 @@ export default function RatePage() {
         throw new Error("Missing redirect URL")
       }
 
-      window.location.assign(data.redirect_url)
+      if (selectedRating <= 3) {
+        if (typeof window !== "undefined") {
+          window.sessionStorage.setItem(
+            `review-contact:${token}`,
+            JSON.stringify({
+              name: trimmedName,
+              email: trimmedEmail,
+            })
+          )
+        }
+        setLowRatingRedirectUrl(data.redirect_url)
+        setLoading(false)
+        return
+      }
+
+      window.location.replace(data.redirect_url)
     } catch (caughtError) {
       const message =
         caughtError instanceof Error
@@ -195,7 +211,7 @@ export default function RatePage() {
             !email.trim()
           }
         >
-          {loading ? "Submitting..." : "Submit Rating"}
+          {loading ? "Submitting..." : "Continue"}
         </button>
 
         <div className={styles.scaleRow}>
@@ -203,6 +219,35 @@ export default function RatePage() {
           <span>Excellent</span>
         </div>
       </section>
+
+      {lowRatingRedirectUrl && (
+        <div className={styles.modalBackdrop} role="presentation">
+          <section
+            className={styles.modalCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="low-rating-title"
+          >
+            <p className={styles.modalEyebrow}>We Want To Make This Right</p>
+            <h2 id="low-rating-title" className={styles.modalTitle}>
+              We are sorry for your experience.
+            </h2>
+            <p className={styles.modalCopy}>
+              Please tell us what happened so our internal team can review it and
+              follow up quickly.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.modalButton}
+                onClick={() => window.location.replace(lowRatingRedirectUrl)}
+              >
+                Continue
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   )
 }

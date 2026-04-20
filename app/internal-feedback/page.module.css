@@ -133,6 +133,28 @@
   color: #1d2a3e;
 }
 
+.contactPanel {
+  margin-top: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(177, 197, 220, 0.42);
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.96), rgba(239, 246, 252, 0.9));
+}
+
+.contactTitle {
+  margin: 0;
+  color: #264867;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.contactCopy {
+  margin: 0.35rem 0 0;
+  color: #5f7488;
+  line-height: 1.6;
+  font-size: 0.93rem;
+}
+
 .formGrid {
   margin-top: 1rem;
   display: grid;
