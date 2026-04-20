@@ -75,7 +75,7 @@ export default function OfficeReviewPage() {
         throw new Error("Missing redirect URL")
       }
 
-      window.location.assign(data.redirect_url)
+      window.location.replace(data.redirect_url)
     } catch (caughtError) {
       const message =
         caughtError instanceof Error
