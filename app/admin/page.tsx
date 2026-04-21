@@ -40,6 +40,29 @@ type CreateReviewRequestResponse = {
   }
 }
 
+type ApiErrorDetail =
+  | string
+  | {
+      msg?: string
+      loc?: Array<string | number>
+    }
+  | Array<{
+      msg?: string
+      loc?: Array<string | number>
+    }>
+
+const formatApiErrorDetail = (detail?: ApiErrorDetail): string => {
+  if (!detail) return "Failed to send review request"
+  if (typeof detail === "string") return detail
+  if (Array.isArray(detail)) {
+    const first = detail[0]
+    if (!first) return "Failed to send review request"
+    const field = first.loc?.length ? String(first.loc[first.loc.length - 1]) : "request"
+    return `${field}: ${first.msg || "Invalid value"}`
+  }
+  return detail.msg || "Failed to send review request"
+}
+
 const DEFAULT_OFFICE_SLUG = "urban-country-management"
 const DEFAULT_OFFICE_NAME = "Urban Country Management"
 
@@ -293,11 +316,11 @@ export default function AdminPage() {
       }
 
       const data = (await response.json().catch(() => ({}))) as CreateReviewRequestResponse & {
-        detail?: string
+        detail?: ApiErrorDetail
       }
 
       if (!response.ok) {
-        throw new Error(data.detail || "Failed to send review request")
+        throw new Error(formatApiErrorDetail(data.detail))
       }
 
       setRequestMessage(
