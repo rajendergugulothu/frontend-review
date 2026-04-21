@@ -324,7 +324,8 @@
 }
 
 .statsPanel,
-.qrPanel {
+.qrPanel,
+.requestPanel {
   border-radius: 1.1rem;
   border: 1px solid var(--ui-border);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.94));
@@ -448,7 +449,8 @@
   );
 }
 
-.qrPanel {
+.qrPanel,
+.requestPanel {
   padding: 1rem;
   display: grid;
   align-content: start;
@@ -470,7 +472,20 @@
   line-height: 1.12;
 }
 
+.requestTitle {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.12;
+}
+
 .qrSubtitle {
+  margin: 0;
+  color: var(--ui-text-soft);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.requestSubtitle {
   margin: 0;
   color: var(--ui-text-soft);
   font-size: 0.9rem;
@@ -481,6 +496,22 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
+}
+
+.requestForm {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.requestField {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.requestLabel {
+  color: #304766;
+  font-size: 0.87rem;
+  font-weight: 700;
 }
 
 .qrInput {
@@ -497,6 +528,54 @@
 .qrInput:focus {
   border-color: rgba(14, 116, 144, 0.6);
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+}
+
+.requestInput,
+.requestSelect {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(133, 157, 190, 0.45);
+  padding: 0.7rem 0.8rem;
+  color: #102038;
+  background: rgba(250, 252, 255, 0.9);
+  outline: none;
+}
+
+.requestInput:focus,
+.requestSelect:focus {
+  border-color: rgba(14, 116, 144, 0.6);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+}
+
+.requestActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.successMessage {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(34, 197, 94, 0.24);
+  color: #166534;
+  background: rgba(220, 252, 231, 0.88);
+}
+
+.requestLinkText {
+  margin: 0;
+  color: #37506a;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.requestLinkText a {
+  color: #0f5f8f;
+  text-decoration: none;
+}
+
+.requestLinkText a:hover {
+  text-decoration: underline;
 }
 
 .qrResult {

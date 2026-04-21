@@ -31,6 +31,15 @@ type OfficeQrInfo = {
   qr_image_url: string
 }
 
+type CreateReviewRequestResponse = {
+  message?: string
+  review_link?: string | null
+  delivery?: {
+    success?: boolean
+    detail?: string
+  }
+}
+
 const DEFAULT_OFFICE_SLUG = "urban-country-management"
 const DEFAULT_OFFICE_NAME = "Urban Country Management"
 
@@ -70,6 +79,13 @@ export default function AdminPage() {
   const [reminderMessage, setReminderMessage] = useState<string | null>(null)
   const [officeQr, setOfficeQr] = useState<OfficeQrInfo | null>(null)
   const [officeQrError, setOfficeQrError] = useState<string | null>(null)
+  const [requestName, setRequestName] = useState("")
+  const [requestEmail, setRequestEmail] = useState("")
+  const [requestEventType, setRequestEventType] = useState("lease_signing")
+  const [sendingRequest, setSendingRequest] = useState(false)
+  const [requestMessage, setRequestMessage] = useState<string | null>(null)
+  const [requestError, setRequestError] = useState<string | null>(null)
+  const [requestReviewLink, setRequestReviewLink] = useState<string | null>(null)
 
   const handleUnauthorized = () => {
     if (typeof window !== "undefined") {
@@ -77,63 +93,51 @@ export default function AdminPage() {
     }
   }
 
-  useEffect(() => {
-    let isMounted = true
+  const loadDashboard = async () => {
+    setLoading(true)
+    setError(null)
 
-    const loadDashboard = async () => {
-      setLoading(true)
-      setError(null)
+    try {
+      const [reviewsRes, analyticsRes] = await Promise.all([
+        fetch("/api/admin/reviews", { cache: "no-store" }),
+        fetch("/api/admin/analytics", { cache: "no-store" }),
+      ])
 
-      try {
-        const [reviewsRes, analyticsRes] = await Promise.all([
-          fetch("/api/admin/reviews", { cache: "no-store" }),
-          fetch("/api/admin/analytics", { cache: "no-store" }),
-        ])
-
-        if (reviewsRes.status === 401 || analyticsRes.status === 401) {
-          handleUnauthorized()
-          return
-        }
-
-        if (!reviewsRes.ok || !analyticsRes.ok) {
-          throw new Error("Failed to load admin data")
-        }
-
-        const reviewsData: unknown = await reviewsRes.json()
-        const analyticsData: Partial<Analytics> = await analyticsRes.json()
-
-        if (!isMounted) return
-
-        setReviews(Array.isArray(reviewsData) ? (reviewsData as Review[]) : [])
-        setStats({
-          average_rating: Number(analyticsData.average_rating ?? 0),
-          total_reviews: Number(analyticsData.total_reviews ?? 0),
-          positive_reviews: Number(analyticsData.positive_reviews ?? 0),
-          negative_reviews: Number(analyticsData.negative_reviews ?? 0),
-          total_requests: Number(analyticsData.total_requests ?? 0),
-          requests_sent: Number(analyticsData.requests_sent ?? 0),
-          completed_reviews: Number(analyticsData.completed_reviews ?? 0),
-          pending_requests: Number(analyticsData.pending_requests ?? 0),
-        })
-        setLastSynced(new Date().toLocaleString())
-      } catch {
-        if (!isMounted) return
-
-        setReviews([])
-        setStats(EMPTY_ANALYTICS)
-        setError("Unable to load dashboard data. Please refresh and try again.")
-      } finally {
-        if (isMounted) {
-          setLoading(false)
-        }
+      if (reviewsRes.status === 401 || analyticsRes.status === 401) {
+        handleUnauthorized()
+        return
       }
-    }
 
+      if (!reviewsRes.ok || !analyticsRes.ok) {
+        throw new Error("Failed to load admin data")
+      }
+
+      const reviewsData: unknown = await reviewsRes.json()
+      const analyticsData: Partial<Analytics> = await analyticsRes.json()
+
+      setReviews(Array.isArray(reviewsData) ? (reviewsData as Review[]) : [])
+      setStats({
+        average_rating: Number(analyticsData.average_rating ?? 0),
+        total_reviews: Number(analyticsData.total_reviews ?? 0),
+        positive_reviews: Number(analyticsData.positive_reviews ?? 0),
+        negative_reviews: Number(analyticsData.negative_reviews ?? 0),
+        total_requests: Number(analyticsData.total_requests ?? 0),
+        requests_sent: Number(analyticsData.requests_sent ?? 0),
+        completed_reviews: Number(analyticsData.completed_reviews ?? 0),
+        pending_requests: Number(analyticsData.pending_requests ?? 0),
+      })
+      setLastSynced(new Date().toLocaleString())
+    } catch {
+      setReviews([])
+      setStats(EMPTY_ANALYTICS)
+      setError("Unable to load dashboard data. Please refresh and try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     loadDashboard()
-
-    return () => {
-      isMounted = false
-    }
   }, [])
 
   const completedCount = useMemo(
@@ -242,6 +246,79 @@ export default function AdminPage() {
   const logout = async () => {
     await fetch("/api/admin/auth/logout", { method: "POST" })
     handleUnauthorized()
+  }
+
+  const sendReviewRequest = async () => {
+    if (sendingRequest) return
+
+    const trimmedName = requestName.trim()
+    const trimmedEmail = requestEmail.trim()
+
+    if (!trimmedName) {
+      setRequestError("Enter the client's name.")
+      return
+    }
+    if (!trimmedEmail) {
+      setRequestError("Enter the client's email.")
+      return
+    }
+    if (!/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
+      setRequestError("Enter a valid client email address.")
+      return
+    }
+
+    setSendingRequest(true)
+    setRequestError(null)
+    setRequestMessage(null)
+    setRequestReviewLink(null)
+
+    try {
+      const response = await fetch("/api/admin/create-review-request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          client_name: trimmedName,
+          client_email: trimmedEmail,
+          event_type: requestEventType,
+          channel: "email",
+          office_code: DEFAULT_OFFICE_NAME,
+        }),
+      })
+
+      if (response.status === 401) {
+        handleUnauthorized()
+        return
+      }
+
+      const data = (await response.json().catch(() => ({}))) as CreateReviewRequestResponse & {
+        detail?: string
+      }
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to send review request")
+      }
+
+      setRequestMessage(
+        data.delivery?.success
+          ? "Review request email sent successfully."
+          : data.delivery?.detail || data.message || "Review request created."
+      )
+      setRequestReviewLink(data.review_link || null)
+      setRequestName("")
+      setRequestEmail("")
+      setRequestEventType("lease_signing")
+      await loadDashboard()
+    } catch (caughtError) {
+      setRequestError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "We could not send the review request."
+      )
+    } finally {
+      setSendingRequest(false)
+    }
   }
 
   return (
@@ -356,6 +433,81 @@ export default function AdminPage() {
                 </article>
               ))}
             </section>
+          </section>
+
+          <section className={styles.requestPanel}>
+            <p className={styles.panelEyebrow}>Direct Outreach</p>
+            <h2 className={styles.requestTitle}>Send review request by email</h2>
+            <p className={styles.requestSubtitle}>
+              Add the client's details, click send, and they will receive a review
+              request email immediately.
+            </p>
+
+            <div className={styles.requestForm}>
+              <label className={styles.requestField}>
+                <span className={styles.requestLabel}>Client name</span>
+                <input
+                  type="text"
+                  value={requestName}
+                  onChange={(event) => setRequestName(event.target.value)}
+                  className={styles.requestInput}
+                  placeholder="Jane Smith"
+                  maxLength={120}
+                  disabled={sendingRequest}
+                />
+              </label>
+
+              <label className={styles.requestField}>
+                <span className={styles.requestLabel}>Client email</span>
+                <input
+                  type="email"
+                  value={requestEmail}
+                  onChange={(event) => setRequestEmail(event.target.value)}
+                  className={styles.requestInput}
+                  placeholder="jane@example.com"
+                  maxLength={180}
+                  disabled={sendingRequest}
+                />
+              </label>
+
+              <label className={styles.requestField}>
+                <span className={styles.requestLabel}>Event type</span>
+                <select
+                  value={requestEventType}
+                  onChange={(event) => setRequestEventType(event.target.value)}
+                  className={styles.requestSelect}
+                  disabled={sendingRequest}
+                >
+                  <option value="lease_signing">Lease signing</option>
+                  <option value="move_in">Move-in</option>
+                  <option value="work_order_completion">Work order completion</option>
+                  <option value="lease_renewal">Lease renewal</option>
+                </select>
+              </label>
+            </div>
+
+            <div className={styles.requestActions}>
+              <button
+                type="button"
+                className={styles.actionButton}
+                onClick={sendReviewRequest}
+                disabled={sendingRequest}
+              >
+                {sendingRequest ? "Sending..." : "Send Email Review Request"}
+              </button>
+            </div>
+
+            {requestError && <p className={styles.error}>{requestError}</p>}
+            {requestMessage && <p className={styles.successMessage}>{requestMessage}</p>}
+            {requestReviewLink && (
+              <p className={styles.requestLinkText}>
+                Review link:
+                {" "}
+                <a href={requestReviewLink} target="_blank" rel="noreferrer">
+                  {requestReviewLink}
+                </a>
+              </p>
+            )}
           </section>
 
           <section className={styles.qrPanel}>
