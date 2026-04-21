@@ -94,9 +94,8 @@ export default function OfficeReviewPage() {
           <p className={styles.eyebrow}>Urban Country Realty</p>
           <h1 className={styles.title}>How was your experience with {DEFAULT_OFFICE_NAME}?</h1>
           <p className={styles.subtitle}>
-            A quick score helps us route your feedback the right way. Great experiences
-            can head to Google, and anything below that comes straight to our internal
-            team for follow-up.
+            A quick score helps us understand your experience and continue improving
+            the service we provide to our community.
           </p>
           <div className={styles.pillRow}>
             <span className={styles.infoPill}>5-point rating</span>
