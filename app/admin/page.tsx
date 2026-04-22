@@ -65,6 +65,49 @@ const formatApiErrorDetail = (detail?: ApiErrorDetail): string => {
 
 const DEFAULT_OFFICE_SLUG = "urban-country-management"
 const DEFAULT_OFFICE_NAME = "Urban Country Management"
+const REVIEW_REQUEST_EVENT_OPTIONS = [
+  {
+    value: "new_tenant_onboarding_experience",
+    label: "New tenant onboarding experience",
+  },
+  {
+    value: "move_in_process_feedback",
+    label: "Move-in process feedback",
+  },
+  {
+    value: "move_out_process_feedback",
+    label: "Move-out process feedback",
+  },
+  {
+    value: "property_management_takeover_transition",
+    label: "Property management takeover transition",
+  },
+  {
+    value: "staff_professionalism_feedback",
+    label: "Staff professionalism feedback",
+  },
+  {
+    value: "communication_clarity_feedback",
+    label: "Communication clarity feedback",
+  },
+  {
+    value: "rent_payment_process_experience",
+    label: "Rent payment process experience",
+  },
+  {
+    value: "landlord_experience_review",
+    label: "Landlord experience review",
+  },
+  {
+    value: "tenant_experience_review",
+    label: "Tenant experience review",
+  },
+  {
+    value: "work_order_completion_feedback",
+    label: "Work Order Completion Feedback",
+  },
+] as const
+const DEFAULT_REVIEW_REQUEST_EVENT = REVIEW_REQUEST_EVENT_OPTIONS[0].value
 
 const EMPTY_ANALYTICS: Analytics = {
   average_rating: 0,
@@ -104,7 +147,7 @@ export default function AdminPage() {
   const [officeQrError, setOfficeQrError] = useState<string | null>(null)
   const [requestName, setRequestName] = useState("")
   const [requestEmail, setRequestEmail] = useState("")
-  const [requestEventType, setRequestEventType] = useState("lease_signing")
+  const [requestEventType, setRequestEventType] = useState<string>(DEFAULT_REVIEW_REQUEST_EVENT)
   const [sendingRequest, setSendingRequest] = useState(false)
   const [requestMessage, setRequestMessage] = useState<string | null>(null)
   const [requestError, setRequestError] = useState<string | null>(null)
@@ -331,7 +374,7 @@ export default function AdminPage() {
       setRequestReviewLink(data.review_link || null)
       setRequestName("")
       setRequestEmail("")
-      setRequestEventType("lease_signing")
+      setRequestEventType(DEFAULT_REVIEW_REQUEST_EVENT)
       await loadDashboard()
     } catch (caughtError) {
       setRequestError(
@@ -501,10 +544,11 @@ export default function AdminPage() {
                   className={styles.requestSelect}
                   disabled={sendingRequest}
                 >
-                  <option value="lease_signing">Lease signing</option>
-                  <option value="move_in">Move-in</option>
-                  <option value="work_order_completion">Work order completion</option>
-                  <option value="lease_renewal">Lease renewal</option>
+                  {REVIEW_REQUEST_EVENT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
